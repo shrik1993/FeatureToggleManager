@@ -8,20 +8,39 @@ from django.http import HttpRequest
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 import pandas as pd
+from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse
+import os
+from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data
+import json
 
+@login_required
+def fileupload(request):
+    print(request.FILES.get('infile'))
+    if request.method == 'POST' and request.FILES['infile']:
+        file_dir = os.path.join(settings.MEDIA_ROOT, str(request.user))
+        uploaded_file_path, uploaded_file_url = upload_file_to_dir(request.user, request.FILES['infile'])
+        result = excel_to_json(uploaded_file_path)
+        d_data = get_datatable_data(result)
+        return render(request, 'app/excel_data.html', 
+                      {'uploaded_file_url': uploaded_file_url,
+                       'd_data': json.dumps(d_data),
+                       'dashboard_title': "Admin Dashboard",
+                       'year':datetime.now().year,
+                       'test_data': d_data,
+        })
+    return render(request, 'app/excel_data.html', {'year':datetime.now().year})
 
 @login_required
 def home(request):
-    ex_data = pd.read_excel(settings.FEATURE_TOGGLE_FILE, skiprows=2)
-    result = ex_data.to_json(orient='table')
-    print(result)
     return render(
         request,
         'app/excel_data.html',
         {
-            'ex_data': result,
+            'title':'Home',
+            'message':'Dashboard.',
+            'year':datetime.now().year,
         }
-        
     )
 
 

@@ -33,6 +33,9 @@
   <ItemGroup>
     <Compile Include="app\forms.py" />
     <Compile Include="app\models.py" />
+    <Compile Include="app\common\utils.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\tests.py" />
     <Compile Include="app\views.py" />
     <Compile Include="app\__init__.py" />
@@ -53,10 +56,14 @@
     <Folder Include="app\static\app\scripts\" />
     <Folder Include="app\templates\" />
     <Folder Include="app\templates\app\" />
+    <Folder Include="app\common\" />
     <Folder Include="FeatureToggleManager\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\app\scripts\admin_dashboard.js" />
     <Content Include="app\templates\app\excel_data.html" />
+    <Content Include="app\templates\app\layout_old.html" />
+    <Content Include="app\templates\app\login_old.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />
