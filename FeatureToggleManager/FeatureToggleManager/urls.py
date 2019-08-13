@@ -30,7 +30,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='/login'), name='logout'),
     path('admin/', admin.site.urls),
     path('uploadfile/', views.fileupload, name='uploadfile'),
-    path('table/<str:table_name>/', views.table_edit, name='table_edit')
+    path('edittable/', views.EditTable.as_view(), name='edit_table')
 ]
 
 if settings.DEBUG:

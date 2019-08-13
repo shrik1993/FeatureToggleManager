@@ -34,7 +34,6 @@ def get_datatable_data(json_data, table_name='admin_table'):
     """
 
     data = json.loads(json_data)
-    #data['data'] = remove_salsh(data['data'])
     return {'data': data['data']}
 
 def get_latest_file_from_dir(dir):
@@ -59,12 +58,28 @@ def dict_to_dataframe(in_dict):
 def excel_append(ex_data, append_dataframe, filepath):
     ex_data = pd.concat([ex_data, append_dataframe], axis=0, ignore_index=True, sort=False)
     ex_data = ex_data.drop(['index'], axis=1)
-    return ex_data.to_excel(filepath, index=False)
+    ex_data.to_excel(filepath, index=False)
+    return 
 
-def excel_remove(ex_data, drop_index):
+def excel_remove(ex_data, drop_index, filepath):
     ex_data = ex_data.drop(drop_index, axis=0)
-    return ex_data
+    ex_data.to_excel(filepath, index=False)
+    return 
         
+def read_user_excel(user, is_superuser):
+    """
+    Reads excel as per the skipped rows for admin and team.
+    """
+
+    file_dir = os.path.join(settings.MEDIA_ROOT, str(user))
+    latest_file = get_latest_file_from_dir(file_dir)
+    if not latest_file:
+        latest_file = "{0}/{1}.{2}".format(file_dir, user, ".xlsx")
+    if is_superuser:
+        ex_data = excel_read(latest_file)
+    else:
+        ex_data = excel_read(latest_file, skiprows=0)
+    return ex_data, latest_file
 
 
 #def remove_salsh(inputdict, replace_for='/', replace_with=' '):

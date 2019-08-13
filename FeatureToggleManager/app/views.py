@@ -7,12 +7,16 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 import pandas as pd
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 import os
-from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir
+from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove
 import json
+from django.views.generic import View
+from django.http import QueryDict
 
 @login_required
 def fileupload(request):
@@ -44,32 +48,74 @@ def home(request):
         }
     )
 
-@login_required
-def table_edit(request, table_name=""):
-    if request.method == "GET":
-        print(table_name)
-        if table_name:
-            return render(request, 'app/WebPage1.html',{"tb_name": "table found"})
-        else:
-            return render(request, 'app/WebPage1.html',{"tb_name": "tb_name not found."})
-    if request.method == "POST":
-        #try:
-        req_data = {}
-        for k, v in request.POST.items():
-            req_data[k] = v
-        print(req_data, table_name)
-        file_dir = os.path.join(settings.MEDIA_ROOT, str(request.user))
-        latest_file = get_latest_file_from_dir(file_dir)
-        if request.user.is_superuser:
-            ex_data = excel_read(latest_file)
-        else:
-            ex_data = excel_read(latest_file, skiprows=0)
-        df = dict_to_dataframe(req_data)
-        excel_append(ex_data, df, latest_file)
-        return HttpResponse("Record added successfully.")
-        #except:
-        #    return HttpResponse("Fail to add record.")
+class EditTable(LoginRequiredMixin, View):
+    http_method_names = ['post', 'put', 'delete']
 
+    @method_decorator(login_required)
+    def post(self, *args, **kwargs):
+        try:
+            req_data = {}
+            for k, v in self.request.POST.items():
+                req_data[k] = v
+            tb_name = req_data.pop('table_name')
+            ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
+            df = dict_to_dataframe(req_data)
+            excel_append(ex_data, df, latest_file)
+            return HttpResponse("Record added successfully.")
+        except:
+            return HttpResponse("Fail to add record.")
+
+    @method_decorator(login_required)
+    def put(self, *args, **kwargs):
+        try:
+            req_data = {}
+            for k, v in self.request.PUT.items():
+                req_data[k] = v
+            tb_name = req_data.pop('table_name')
+            ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
+            df = dict_to_dataframe(req_data)
+            excel_append(ex_data, df, latest_file)
+            return HttpResponse("Record added successfully.")
+        except:
+            return HttpResponse("Fail to add record.")
+
+    @method_decorator(login_required)
+    def delete(self, *args, **kwargs):
+        try:
+            put = QueryDict(self.request.body)
+            tb_name = put.get('table_name')
+            index_id = put.get('index_id')
+            print(tb_name, index_id)
+            ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
+            excel_remove(ex_data, int(index_id), latest_file)
+            return HttpResponse("Record deleted successfully.")
+        except: 
+            HttpResponse("Fail to delete record.")
+
+
+
+#@login_required
+#def table_edit(request, table_name="", index_id=""):
+#    if request.method == "POST":
+#        try:
+#            req_data = {}
+#            for k, v in request.POST.items():
+#                req_data[k] = v
+#            ex_data, latest_file = read_user_excel(request.user, request.user.is_superuser)
+#            df = dict_to_dataframe(req_data)
+#            excel_append(ex_data, df, latest_file)
+#            return HttpResponse("Record added successfully.")
+#        except:
+#            return HttpResponse("Fail to add record.")
+#    elif request.method == "DELETE":
+#        print("In DELETE!")
+#        ex_data, latest_file = read_user_excel(request.user, request.user.is_superuser)
+#        excel_remove(ex_data, int(index_id), latest_file)
+#        return HttpResponse("Record deleted successfully.")
+#    else:
+#        pass
+
+        
 
 def contact(request):
     """Renders the contact page."""

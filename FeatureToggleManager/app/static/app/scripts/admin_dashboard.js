@@ -27,17 +27,48 @@ function datatotable_gen(data, table_id, token) {
             text: 'Delete',
             name: 'delete'        // do not change name
         },
-        'copy', 'excel', 'pdf', 'colvis',
+            'copy', 'excel', 'pdf', 'colvis',
         ],
         onAddRow: function (datatable, rowdata, success, error) {
-            console.log(rowdata);
+            rowdata["table_name"] = table_id;
             $.ajax({
-                url: '/table/admin_table/',
+                url: '/edittable/',
                 headers: { "X-CSRFToken": token },
                 type: 'POST',
                 data: rowdata,
                 success: function (data) {
-                    alert(data); 
+                    alert(data);
+                },
+                error: function (data) {
+                    alert(data);
+                },
+            });
+        },
+        onDeleteRow: function (datatable, rowdata, success, error) {
+            console.log(rowdata);
+            var data = { "table_name": table_id, "index_id": rowdata['index'] };
+            $.ajax({
+                url: '/edittable/',
+                headers: { "X-CSRFToken": token },
+                type: 'DELETE',
+                data: data,
+                success: function (data) {
+                    alert(data);
+                },
+                error: function (data) {
+                    alert(data);
+                },
+            });
+        },
+        onEditRow: function (datatable, rowdata, success, error) {
+            rowdata["table_name"] = table_id;
+            $.ajax({
+                url: '/edittable/',
+                headers: { "X-CSRFToken": token },
+                type: 'PUT',
+                data: rowdata,
+                success: function (data) {
+                    alert(data);
                 },
                 error: function (data) {
                     alert(data);

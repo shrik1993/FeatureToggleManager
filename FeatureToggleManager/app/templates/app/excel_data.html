@@ -26,9 +26,7 @@
             <h1 class="page-header">{{dashboard_title}}</h1>
             <div class="container">
 	            <form id="upload_form" action={% url 'uploadfile' %} method="post" class="form-horizontal" enctype="multipart/form-data">
-                {% if uploaded_file_url %}
-                <div>File Uploaded Successfully!</div>
-                {% endif %}
+                
                 {% csrf_token %}
                 <fieldset>
                     <div class="form-horizontal">
@@ -43,6 +41,10 @@
                                         <input type="submit" value="Upload" class="rounded-0 btn btn-primary">
                                     </div>
                                 </div>
+                                {% if uploaded_file_url %}
+                                    <div class="alert alert-warning alert-dismissible">File Uploaded Successfully!
+                                </div>
+                                {% endif %}
                             </div>
                             </div>
                         </div>                        
