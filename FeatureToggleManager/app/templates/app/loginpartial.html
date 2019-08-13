@@ -1,16 +1,17 @@
 {% if user.is_authenticated %}
-<div class="navbar-nav ml-auto">
-    <form id="logoutForm" action="/logout/" method="post" class="navbar-right">
+
+<form id="logoutForm" action="/logout/" method="post" >
+    <ul class="nav navbar-nav navbar-right">
         {% csrf_token %}
-        <span class="navbar-brand">Hello {{ user.username }}!</span>
-        <a href="javascript:document.getElementById('logoutForm').submit()">Log Out</a>
-    </form>
-</div>
+        <li><a><span class="glyphicon glyphicon-user"></span> {{ user.username }}</a></li>
+        <li><a href="javascript:document.getElementById('logoutForm').submit()"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+    </ul>
+</form>
 
 {% else %}
 
-<div class="navbar-nav ml-auto">
-    <a href="{% url 'login' %}" class="nav-item nav-link">Login</a>
-</div>
+<ul class="nav navbar-nav navbar-right">
+    <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+</ul>
 
 {% endif %}

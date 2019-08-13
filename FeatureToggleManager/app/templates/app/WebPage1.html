@@ -1,0 +1,13 @@
+﻿{% extends "app/layout.html" %}
+
+
+{% block content %}
+<div class="container-fluid">
+    <h1>{{dashboard_title}}</h1>
+    {% if user.is_superuser %}
+    <div class="container-fluid">
+        {{tb_name}}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -11,7 +11,7 @@ import pandas as pd
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 import os
-from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data
+from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir
 import json
 
 @login_required
@@ -39,9 +39,36 @@ def home(request):
         {
             'title':'Home',
             'message':'Dashboard.',
+            'dashboard_title': "Dashboard",
             'year':datetime.now().year,
         }
     )
+
+@login_required
+def table_edit(request, table_name=""):
+    if request.method == "GET":
+        print(table_name)
+        if table_name:
+            return render(request, 'app/WebPage1.html',{"tb_name": "table found"})
+        else:
+            return render(request, 'app/WebPage1.html',{"tb_name": "tb_name not found."})
+    if request.method == "POST":
+        #try:
+        req_data = {}
+        for k, v in request.POST.items():
+            req_data[k] = v
+        print(req_data, table_name)
+        file_dir = os.path.join(settings.MEDIA_ROOT, str(request.user))
+        latest_file = get_latest_file_from_dir(file_dir)
+        if request.user.is_superuser:
+            ex_data = excel_read(latest_file)
+        else:
+            ex_data = excel_read(latest_file, skiprows=0)
+        df = dict_to_dataframe(req_data)
+        excel_append(ex_data, df, latest_file)
+        return HttpResponse("Record added successfully.")
+        #except:
+        #    return HttpResponse("Fail to add record.")
 
 
 def contact(request):
