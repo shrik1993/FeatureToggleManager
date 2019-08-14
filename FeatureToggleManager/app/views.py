@@ -13,14 +13,13 @@ import pandas as pd
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 import os
-from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove
+from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update
 import json
 from django.views.generic import View
 from django.http import QueryDict
 
 @login_required
 def fileupload(request):
-    print(request.FILES.get('infile'))
     if request.method == 'POST' and request.FILES['infile']:
         file_dir = os.path.join(settings.MEDIA_ROOT, str(request.user))
         uploaded_file_path, uploaded_file_url = upload_file_to_dir(request.user, request.FILES['infile'])
@@ -61,61 +60,38 @@ class EditTable(LoginRequiredMixin, View):
             ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
             df = dict_to_dataframe(req_data)
             excel_append(ex_data, df, latest_file)
-            return HttpResponse("Record added successfully.")
+            return HttpResponse(json.dumps("Record added successfully."))
         except:
-            return HttpResponse("Fail to add record.")
+            raise Exception("Fail to add record.")
 
     @method_decorator(login_required)
     def put(self, *args, **kwargs):
         try:
+            put = QueryDict(self.request.body)
             req_data = {}
-            for k, v in self.request.PUT.items():
+            for k, v in put.items():
                 req_data[k] = v
             tb_name = req_data.pop('table_name')
             ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
+            print(ex_data)
             df = dict_to_dataframe(req_data)
-            excel_append(ex_data, df, latest_file)
-            return HttpResponse("Record added successfully.")
+            excel_update(ex_data, df, latest_file)
+            return HttpResponse(json.dumps("Record added successfully."))
         except:
-            return HttpResponse("Fail to add record.")
+            raise Exception("Fail to add record.")
 
     @method_decorator(login_required)
     def delete(self, *args, **kwargs):
         try:
-            put = QueryDict(self.request.body)
-            tb_name = put.get('table_name')
-            index_id = put.get('index_id')
-            print(tb_name, index_id)
+            delete_r = QueryDict(self.request.body)
+            tb_name = delete_r.get('table_name')
+            index_id = delete_r.get('index_id')
             ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
             excel_remove(ex_data, int(index_id), latest_file)
-            return HttpResponse("Record deleted successfully.")
+            return HttpResponse(json.dumps("Record deleted successfully."))
         except: 
-            HttpResponse("Fail to delete record.")
+            raise Exception('Record delete failed.')
 
-
-
-#@login_required
-#def table_edit(request, table_name="", index_id=""):
-#    if request.method == "POST":
-#        try:
-#            req_data = {}
-#            for k, v in request.POST.items():
-#                req_data[k] = v
-#            ex_data, latest_file = read_user_excel(request.user, request.user.is_superuser)
-#            df = dict_to_dataframe(req_data)
-#            excel_append(ex_data, df, latest_file)
-#            return HttpResponse("Record added successfully.")
-#        except:
-#            return HttpResponse("Fail to add record.")
-#    elif request.method == "DELETE":
-#        print("In DELETE!")
-#        ex_data, latest_file = read_user_excel(request.user, request.user.is_superuser)
-#        excel_remove(ex_data, int(index_id), latest_file)
-#        return HttpResponse("Record deleted successfully.")
-#    else:
-#        pass
-
-        
 
 def contact(request):
     """Renders the contact page."""

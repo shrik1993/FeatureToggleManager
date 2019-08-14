@@ -5,7 +5,6 @@ function datatotable_gen(data, table_id, token) {
     $.each(keys, function (i, v) {
         columns.push({ 'data': v, 'title': v });
     });
-
     myTables = $("#" + table_id).DataTable({
         "data": data['data'],
         "columns": columns,
@@ -27,6 +26,10 @@ function datatotable_gen(data, table_id, token) {
             text: 'Delete',
             name: 'delete'        // do not change name
         },
+        {
+            text: "Refresh",
+            name: 'refresh'
+        },
             'copy', 'excel', 'pdf', 'colvis',
         ],
         onAddRow: function (datatable, rowdata, success, error) {
@@ -36,12 +39,8 @@ function datatotable_gen(data, table_id, token) {
                 headers: { "X-CSRFToken": token },
                 type: 'POST',
                 data: rowdata,
-                success: function (data) {
-                    alert(data);
-                },
-                error: function (data) {
-                    alert(data);
-                },
+                success: success,
+                error: error
             });
         },
         onDeleteRow: function (datatable, rowdata, success, error) {
@@ -52,12 +51,8 @@ function datatotable_gen(data, table_id, token) {
                 headers: { "X-CSRFToken": token },
                 type: 'DELETE',
                 data: data,
-                success: function (data) {
-                    alert(data);
-                },
-                error: function (data) {
-                    alert(data);
-                },
+                success: success,
+                error: error
             });
         },
         onEditRow: function (datatable, rowdata, success, error) {
@@ -67,12 +62,8 @@ function datatotable_gen(data, table_id, token) {
                 headers: { "X-CSRFToken": token },
                 type: 'PUT',
                 data: rowdata,
-                success: function (data) {
-                    alert(data);
-                },
-                error: function (data) {
-                    alert(data);
-                },
+                success: success,
+                error: error
             });
         },
     });

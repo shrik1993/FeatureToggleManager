@@ -241,16 +241,17 @@
                 var adata = dt.rows({
                     selected: true
                 });
-                
                 var columnDefs = this.completeColumnDefs();
                 var data = this.createDialog(columnDefs, 'Edit Record', 'Edit', 'Close', 'editRowBtn');
-
+                
                 var selector = this.modal_selector;
                 
                 for (var j in columnDefs) {
                     var arrIndex = "['" + columnDefs[j].name.toString().split(".").join("']['") + "']";
                     var selectedValue = eval("adata.data()[0]" + arrIndex);
-                    var jquerySelector = "#" + columnDefs[j].name.toString().replace(/\./g, "\\.");
+                    //var jquerySelector = "#" + columnDefs[j].name.toString().replace(/\./g, "\\.");
+                    // Reaplaced as as the id are populated with spaces corresponding to specific columns.
+                    var jquerySelector = "[id='" + columnDefs[j].name.toString().replace(/\./g, "\\.") + "']";
                     $(selector).find(jquerySelector).val(this._quoteattr(selectedValue));
                     $(selector).find(jquerySelector).trigger("change"); // required by select2
                 }
@@ -277,11 +278,10 @@
                     rowDataArray[$(this).attr('id')] = $(this).val();
                 });
 
-                console.log(rowDataArray); //DEBUG
-
                 that.onEditRow(that,
                     rowDataArray,
-                    function(data,b,c,d,e){ that._editRowCallback(data,b,c,d,e); },
+                    function(data,b,c,d,e){ that._editRowCallback(rowDataArray // Changed data to rowDataArray to resolve update refresh table issue.
+                        ,b,c,d,e); },
                     function(data){ that._errorCallback(data);
                 });
             },

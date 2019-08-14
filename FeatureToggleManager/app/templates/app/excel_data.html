@@ -24,7 +24,7 @@
     <div class="row">
         <div class="col-sm-9 col-md-10 main">
             <h1 class="page-header">{{dashboard_title}}</h1>
-            <div class="container">
+            <div class="container-fluid">
 	            <form id="upload_form" action={% url 'uploadfile' %} method="post" class="form-horizontal" enctype="multipart/form-data">
                 
                 {% csrf_token %}

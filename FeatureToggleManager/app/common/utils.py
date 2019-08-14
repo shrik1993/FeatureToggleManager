@@ -56,15 +56,22 @@ def dict_to_dataframe(in_dict):
     return df
 
 def excel_append(ex_data, append_dataframe, filepath):
-    ex_data = pd.concat([ex_data, append_dataframe], axis=0, ignore_index=True, sort=False)
-    ex_data = ex_data.drop(['index'], axis=1)
-    ex_data.to_excel(filepath, index=False)
-    return 
+    try:
+        print("IN append before: {0}".format(ex_data))
+        ex_data = pd.concat([ex_data, append_dataframe], axis=0, ignore_index=True, sort=False)
+        print("IN append after: {0}".format(ex_data))
+        ex_data.to_excel(filepath, index=False)
+    except:
+        raise Exception('Excel append record failed.')
 
 def excel_remove(ex_data, drop_index, filepath):
-    ex_data = ex_data.drop(drop_index, axis=0)
-    ex_data.to_excel(filepath, index=False)
-    return 
+    try:
+        print("IN delete before: {0}".format(ex_data))
+        new_ex_data = ex_data.drop(drop_index, axis=0)
+        print("IN delete after: {0}".format(new_ex_data))
+        new_ex_data.to_excel(filepath, index=False)
+    except:
+        raise Exception('Excel remove record failed.')
         
 def read_user_excel(user, is_superuser):
     """
@@ -81,18 +88,14 @@ def read_user_excel(user, is_superuser):
         ex_data = excel_read(latest_file, skiprows=0)
     return ex_data, latest_file
 
-
-#def remove_salsh(inputdict, replace_for='/', replace_with=' '):
-#    """
-#    Removes the '/' from the json dict keys.
-#    As '/' cause trouble in jquery datatble later.
-#    :return filtered data
-#    """
-#    for indict in inputdict:
-#        for key in indict.keys():
-#            if replace_for in key:
-#                new_key = key.replace(replace_for, replace_with) 
-#                indict[new_key] =indict.pop(key)
-#            else:
-#                pass
-#    return 
+def excel_update(ex_data, update_dataframe, filepath):
+    """
+    Update existing record in the excel file.
+    """
+    try:
+        print("IN update before: {0}".format(ex_data))
+        ex_data.update(update_dataframe)
+        ex_data.to_excel(filepath, index=False)
+        print("IN update after: {0}".format(ex_data))
+    except:
+        raise Exception('Excel update record failed.')
