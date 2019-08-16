@@ -60,9 +60,11 @@
     <Folder Include="FeatureToggleManager\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\app\content\excel_data.css" />
     <Content Include="app\static\app\scripts\admin_dashboard.js" />
     <Content Include="app\static\app\scripts\example2.js" />
     <Content Include="app\static\app\scripts\login.js" />
+    <Content Include="app\static\app\scripts\team_accordians.js" />
     <Content Include="app\templates\app\excel_data.html" />
     <Content Include="app\templates\app\datatable_editor_example.html" />
     <Content Include="app\templates\app\WebPage1.html" />

@@ -8,7 +8,7 @@ function datatotable_gen(data, table_id, token) {
     myTables = $("#" + table_id).DataTable({
         "data": data['data'],
         "columns": columns,
-        dom: 'Bfrtip',        // Needs button container
+        dom: 'Blfrtip',        // Needs button container
         select: 'single',
         //responsive: true,
         altEditor: true,

@@ -73,7 +73,6 @@ class EditTable(LoginRequiredMixin, View):
                 req_data[k] = v
             tb_name = req_data.pop('table_name')
             ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
-            print(ex_data)
             df = dict_to_dataframe(req_data)
             excel_update(ex_data, df, latest_file)
             return HttpResponse(json.dumps("Record added successfully."))

@@ -3,14 +3,19 @@
 {% load staticfiles %}
 {% load jsonify %}
 
+
 {% block scripts %}
 
 {% if d_data %}
+<link rel="stylesheet" href="{% static 'app/content/excel_data.css' %}" />
+
+<script src="{% static 'app/scripts/team_accordians.js' %}"></script>
 <script>
     $(document).ready(function () {
         
         // d_data should be jsonified by jsonify django filter.
         var t_data = JSON.parse({{ d_data |jsonify}});
+        generate_team_accordian('admin');
         var csrf_token = '{{csrf_token|safe}}';
         datatotable_gen(t_data, 'admin_table', csrf_token);
     });
@@ -55,11 +60,17 @@
         </div>
     </div>
 {% endif %}
+{% if uploaded_file_url %}
     <div class="row">
         <h2 class="sub-header">Team-Wise Features</h2>
-        <div class="table-responsive">
-            <table id="admin_table" class="table table-striped table-bordered"></table>
+        <div class="col-md-12">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div id="team_accordians"></div>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
-</div>
+{% endif %}
 {% endblock %}

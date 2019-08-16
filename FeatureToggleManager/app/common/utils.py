@@ -5,6 +5,7 @@ from django.core.files.storage import FileSystemStorage
 import pandas as pd
 import json
 import glob
+from collections import defaultdict
 
 def upload_file_to_dir(user, uploaded_file):
     """
@@ -25,7 +26,9 @@ def excel_to_json(filepath, skip_rows=2):
     """
     ex_data = pd.read_excel(filepath, skiprows=skip_rows)
     result = ex_data.to_json(orient='table')
-    return result
+    teamwise_data = excel_data_to_teamwise_data(result)
+    print(teamwise_data)
+    return teamwise_data
 
 def get_datatable_data(json_data, table_name='admin_table'):
     """
@@ -99,3 +102,14 @@ def excel_update(ex_data, update_dataframe, filepath):
         print("IN update after: {0}".format(ex_data))
     except:
         raise Exception('Excel update record failed.')
+
+
+def excel_data_to_teamwise_data(ex_data):
+    """
+    Converts imported excel data to the team-wise data for individual table creation.
+    """
+    result = defaultdict(lambda: [])
+    dict_result = json.loads(ex_data)
+    for i in dict_result['data']:
+        result[i['Team']].append(i)
+    return result
