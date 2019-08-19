@@ -26,9 +26,7 @@ def excel_to_json(filepath, skip_rows=2):
     """
     ex_data = pd.read_excel(filepath, skiprows=skip_rows)
     result = ex_data.to_json(orient='table')
-    teamwise_data = excel_data_to_teamwise_data(result)
-    print(teamwise_data)
-    return teamwise_data
+    return result
 
 def get_datatable_data(json_data, table_name='admin_table'):
     """
@@ -60,18 +58,14 @@ def dict_to_dataframe(in_dict):
 
 def excel_append(ex_data, append_dataframe, filepath):
     try:
-        print("IN append before: {0}".format(ex_data))
         ex_data = pd.concat([ex_data, append_dataframe], axis=0, ignore_index=True, sort=False)
-        print("IN append after: {0}".format(ex_data))
         ex_data.to_excel(filepath, index=False)
     except:
         raise Exception('Excel append record failed.')
 
 def excel_remove(ex_data, drop_index, filepath):
     try:
-        print("IN delete before: {0}".format(ex_data))
         new_ex_data = ex_data.drop(drop_index, axis=0)
-        print("IN delete after: {0}".format(new_ex_data))
         new_ex_data.to_excel(filepath, index=False)
     except:
         raise Exception('Excel remove record failed.')
@@ -104,12 +98,21 @@ def excel_update(ex_data, update_dataframe, filepath):
         raise Exception('Excel update record failed.')
 
 
-def excel_data_to_teamwise_data(ex_data):
+def excel_data_to_teamwise_data(filepath, skip_rows=2):
     """
     Converts imported excel data to the team-wise data for individual table creation.
     """
+
+    ex_data = pd.read_excel(filepath, skiprows=skip_rows)
+    ex_data = ex_data.to_json(orient='table')
     result = defaultdict(lambda: [])
     dict_result = json.loads(ex_data)
     for i in dict_result['data']:
+        try:
+            count = len(result[i['Team']])
+        except:
+            count = 0
+        i.update({'index': count})
         result[i['Team']].append(i)
+        count+=1
     return result

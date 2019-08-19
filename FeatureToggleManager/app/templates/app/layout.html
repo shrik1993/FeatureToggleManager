@@ -43,8 +43,6 @@
                 </div>
             <ul class="nav navbar-nav">
                     <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'about' %}">About</a></li>
-                    <li><a href="{% url 'contact' %}">Contact</a></li>
             </ul>
                 {% include 'app/loginpartial.html' %}
                 </div>
@@ -53,13 +51,13 @@
     <main class="container-fluid">
         {% block content %}{% endblock %}
     </main>
-    <footer class="footer text-cente">
+    <div class="footerplace">
         <div class="container-fluid">
             <div class="row">
                 <p>&copy; {{ year }} - FeatureTracker Application</p>
             </div>
         </div>
-    </footer>
+    </div>
 {% block scripts %}{% endblock %}
 </body>
 </html>                            

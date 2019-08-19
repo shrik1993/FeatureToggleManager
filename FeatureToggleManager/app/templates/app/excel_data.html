@@ -10,25 +10,27 @@
 <link rel="stylesheet" href="{% static 'app/content/excel_data.css' %}" />
 
 <script src="{% static 'app/scripts/team_accordians.js' %}"></script>
+<script src="{% static 'app/scripts/generate_all_datatable.js' %}"></script>
 <script>
     $(document).ready(function () {
         
         // d_data should be jsonified by jsonify django filter.
         var t_data = JSON.parse({{ d_data |jsonify}});
-        generate_team_accordian('admin');
         var csrf_token = '{{csrf_token|safe}}';
-        datatotable_gen(t_data, 'admin_table', csrf_token);
+        generate_datatables(t_data, csrf_token, true);
+        
     });
 </script>
 {% endif %}
 {% endblock %}
 
 {% block content %}
-{% if user.is_superuser %}
+
 <div class="container-fluid">
+    <h1 class="page-header">{{dashboard_title}}</h1>
     <div class="row">
-        <div class="col-sm-9 col-md-10 main">
-            <h1 class="page-header">{{dashboard_title}}</h1>
+        <div class="col-sm-12 col-md-12 main">
+            {% if user.is_superuser %}
             <div class="container-fluid">
 	            <form id="upload_form" action={% url 'uploadfile' %} method="post" class="form-horizontal" enctype="multipart/form-data">
                 
@@ -60,17 +62,15 @@
         </div>
     </div>
 {% endif %}
-{% if uploaded_file_url %}
-    <div class="row">
-        <h2 class="sub-header">Team-Wise Features</h2>
-        <div class="col-md-12">
-            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                <div class="panel panel-default">
-                    <div id="team_accordians"></div>
-                </div>
+    {% if user.is_superuser %}
+    <h2 class="page-header">Team's Features</h2>
+    {% endif %}
+    <div class="col-md-12">
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div id="team_accordians"></div>
             </div>
         </div>
-        </div>
     </div>
-{% endif %}
+    </div>
 {% endblock %}

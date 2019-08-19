@@ -13,7 +13,7 @@ import pandas as pd
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 import os
-from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update
+from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update, excel_data_to_teamwise_data
 import json
 from django.views.generic import View
 from django.http import QueryDict
@@ -23,26 +23,30 @@ def fileupload(request):
     if request.method == 'POST' and request.FILES['infile']:
         file_dir = os.path.join(settings.MEDIA_ROOT, str(request.user))
         uploaded_file_path, uploaded_file_url = upload_file_to_dir(request.user, request.FILES['infile'])
-        result = excel_to_json(uploaded_file_path)
-        d_data = get_datatable_data(result)
+        #result = excel_to_json(uploaded_file_path)
+        #d_data = get_datatable_data(result)
+        result = excel_data_to_teamwise_data(uploaded_file_path)
         return render(request, 'app/excel_data.html', 
                       {'uploaded_file_url': uploaded_file_url,
-                       'd_data': json.dumps(d_data),
+                       'd_data': json.dumps(result),
                        'dashboard_title': "Admin Dashboard",
                        'year':datetime.now().year,
-                       'test_data': d_data,
         })
     return render(request, 'app/excel_data.html', {'year':datetime.now().year})
 
 @login_required
 def home(request):
+    file_dir = os.path.join(settings.MEDIA_ROOT, str(request.user))
+    latest_file = get_latest_file_from_dir(file_dir)
+    print(latest_file)
+    result = excel_data_to_teamwise_data(latest_file)
     return render(
         request,
         'app/excel_data.html',
         {
+            'd_data': json.dumps(result),
             'title':'Home',
-            'message':'Dashboard.',
-            'dashboard_title': "Dashboard",
+            'dashboard_title': "Team Dashboard",
             'year':datetime.now().year,
         }
     )
@@ -90,30 +94,3 @@ class EditTable(LoginRequiredMixin, View):
             return HttpResponse(json.dumps("Record deleted successfully."))
         except: 
             raise Exception('Record delete failed.')
-
-
-def contact(request):
-    """Renders the contact page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/contact.html',
-        {
-            'title':'Contact',
-            'message':'Your contact page.',
-            'year':datetime.now().year,
-        }
-    )
-
-def about(request):
-    """Renders the about page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/about.html',
-        {
-            'title':'About',
-            'message':'Your application description page.',
-            'year':datetime.now().year,
-        }
-    )

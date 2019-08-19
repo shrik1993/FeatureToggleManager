@@ -35,6 +35,7 @@ a:hover, a:focus {
 
         #accordion .panel-title a.collapsed:hover {
             color: #ef6145;
+            background: #DCDCDC;
         }
 
     #accordion .panel-title a:before {
