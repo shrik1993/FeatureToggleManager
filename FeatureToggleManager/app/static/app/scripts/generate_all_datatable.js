@@ -1,20 +1,20 @@
-function add_colum_filter(table_id, d_table) {
-    // Setup - add a text input to each footer cell
-    $('#' + table_id + ' thead tr').clone(true).appendTo('#' + table_id + ' thead');
-    $('#' + table_id + ' thead tr:eq(1) tr').each(function (i) {
-        var title = $(this).text();
-        $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+//function add_colum_filter(table_id, d_table) {
+//    // Setup - add a text input to each footer cell
+//    $('#' + table_id + ' thead tr').clone(true).appendTo('#' + table_id + ' thead');
+//    $('#' + table_id + ' thead tr:eq(1) tr').each(function (i) {
+//        var title = $(this).text();
+//        $(this).html('<input type="text" placeholder="Search ' + title + '" />');
 
-        $('input', this).on('keyup change', function () {
-            if (d_table.column(i).search() !== this.value) {
-                d_table
-                    .column(i)
-                    .search(this.value)
-                    .draw();
-            }
-        });
-    });
-};
+//        $('input', this).on('keyup change', function () {
+//            if (d_table.column(i).search() !== this.value) {
+//                d_table
+//                    .column(i)
+//                    .search(this.value)
+//                    .draw();
+//            }
+//        });
+//    });
+//};
 
 function generate_datatables(t_data, csrf_token, editable) {
     buttons = [{
@@ -51,6 +51,6 @@ function generate_datatables(t_data, csrf_token, editable) {
         } else {
             dt_table = datatotable_gen(value, table_name, csrf_token, editable)
         }
-        add_colum_filter(table_name, dt_table);
+        //add_colum_filter(table_name, dt_table);
     }
 }
