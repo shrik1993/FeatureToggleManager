@@ -36,17 +36,23 @@ def fileupload(request):
 
 @login_required
 def home(request):
+    result = {}
+    dashboard_title = ""
+    if not request.user.is_superuser:
+        dashboard_title = "Team Dashboard"
     file_dir = os.path.join(settings.MEDIA_ROOT, str(request.user))
-    latest_file = get_latest_file_from_dir(file_dir)
-    print(latest_file)
-    result = excel_data_to_teamwise_data(latest_file)
+    try:
+        latest_file = get_latest_file_from_dir(file_dir)
+        result = excel_data_to_teamwise_data(latest_file)
+    except:
+        pass
     return render(
         request,
         'app/excel_data.html',
         {
             'd_data': json.dumps(result),
             'title':'Home',
-            'dashboard_title': "Team Dashboard",
+            'dashboard_title': dashboard_title,
             'year':datetime.now().year,
         }
     )

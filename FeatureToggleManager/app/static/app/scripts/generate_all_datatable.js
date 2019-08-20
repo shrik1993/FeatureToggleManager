@@ -1,3 +1,21 @@
+function add_colum_filter(table_id, d_table) {
+    // Setup - add a text input to each footer cell
+    $('#' + table_id + ' thead tr').clone(true).appendTo('#' + table_id + ' thead');
+    $('#' + table_id + ' thead tr:eq(1) tr').each(function (i) {
+        var title = $(this).text();
+        $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+
+        $('input', this).on('keyup change', function () {
+            if (d_table.column(i).search() !== this.value) {
+                d_table
+                    .column(i)
+                    .search(this.value)
+                    .draw();
+            }
+        });
+    });
+};
+
 function generate_datatables(t_data, csrf_token, editable) {
     buttons = [{
         text: 'Add',
@@ -29,9 +47,10 @@ function generate_datatables(t_data, csrf_token, editable) {
         generate_team_accordian(team_name);
         var table_name = team_name + "_table";
         if (editable) {
-            datatotable_gen(value, table_name, csrf_token, editable, buttons);
+            dt_table = datatotable_gen(value, table_name, csrf_token, editable, buttons);
         } else {
-            datatotable_gen(value, table_name, csrf_token, editable)
+            dt_table = datatotable_gen(value, table_name, csrf_token, editable)
         }
+        add_colum_filter(table_name, dt_table);
     }
 }

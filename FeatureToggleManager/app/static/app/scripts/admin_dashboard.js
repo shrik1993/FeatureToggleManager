@@ -6,11 +6,12 @@ function datatotable_gen(data, table_id, token, editable, in_buttons=[]) {
     $.each(keys, function (i, v) {
         columns.push({ 'data': v, 'title': v });
     });
-    myTables = $("#" + table_id).DataTable({
+    Dt_table = $("#" + table_id).DataTable({
         "data": data,
         "columns": columns,
         dom: 'Blfrtip',        // Needs button container
         select: 'single',
+        fixedHeader: true,
         //responsive: true,
         altEditor: editable,
         buttons: in_buttons,
@@ -49,4 +50,5 @@ function datatotable_gen(data, table_id, token, editable, in_buttons=[]) {
             });
         },
     });
+    return Dt_table
 };
