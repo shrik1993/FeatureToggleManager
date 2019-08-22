@@ -2,6 +2,10 @@
 Definition of models.
 """
 
-from django.db import models
+from djongo import models
+from django_pandas.managers import DataFrameManager
 
-# Create your models here.
+class TeamData(models.Model):
+    columns = models.ListField()
+    data = models.ListField()
+    team_name = models.CharField(max_length=200)

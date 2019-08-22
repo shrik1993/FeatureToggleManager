@@ -13,10 +13,11 @@ import pandas as pd
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 import os
-from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update, excel_data_to_teamwise_data
+from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update, excel_data_to_teamwise_data, dataframe_to_mongodata, mongodata_to_dict, ex_data_to_mongo_data
 import json
 from django.views.generic import View
 from django.http import QueryDict
+from app.models import TeamData
 
 @login_required
 def fileupload(request):
@@ -25,7 +26,11 @@ def fileupload(request):
         uploaded_file_path, uploaded_file_url = upload_file_to_dir(request.user, request.FILES['infile'])
         #result = excel_to_json(uploaded_file_path)
         #d_data = get_datatable_data(result)
-        result = excel_data_to_teamwise_data(uploaded_file_path)
+        result, cols = ex_data_to_mongo_data(uploaded_file_path)
+        teams_data = []
+        for k, v in result.items():
+            teams_data.append(TeamData(columns=cols, data=[list(val.values()) for val in v], team_name=k))
+        TeamData.objects.bulk_create(teams_data)
         return render(request, 'app/excel_data.html', 
                       {'uploaded_file_url': uploaded_file_url,
                        'd_data': json.dumps(result),
@@ -41,16 +46,27 @@ def home(request):
     if not request.user.is_superuser:
         dashboard_title = "Team Dashboard"
     file_dir = os.path.join(settings.MEDIA_ROOT, str(request.user))
-    try:
-        latest_file = get_latest_file_from_dir(file_dir)
-        result = excel_data_to_teamwise_data(latest_file)
-    except:
-        pass
+    #try:
+    #latest_file = get_latest_file_from_dir(file_dir)
+    #result = excel_data_to_teamwise_data(latest_file)
+    #cols, data = dataframe_to_mongodata(latest_file)
+    #teams_data = TeamData(columns=cols, data=data)
+    #print('hi')
+    #teams_data.save()
+    data_dict={}
+    #try:
+    latest_record = TeamData.objects.values('team_name', 'columns', 'data')
+    print(latest_record.values())
+    #if latest_record:
+        #data_dict = mongodata_to_dict(latest_record)
+        #print(data_dict)
+    #except:
+        #pass
     return render(
         request,
         'app/excel_data.html',
         {
-            'd_data': json.dumps(result),
+            'd_data': json.dumps(data_dict),
             'title':'Home',
             'dashboard_title': dashboard_title,
             'year':datetime.now().year,

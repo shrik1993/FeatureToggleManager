@@ -116,3 +116,48 @@ def excel_data_to_teamwise_data(filepath, skip_rows=2):
         result[i['Team']].append(i)
         count+=1
     return result
+
+def dataframe_to_mongodata(filepath, skip_rows=2):
+    """
+    Converts excel pandas dataframe to mongo data
+    """
+    
+    ex_data = pd.read_excel(filepath, skiprows=skip_rows)
+    ex_data = ex_data.to_json(orient='table')
+    dict_result = json.loads(ex_data)
+    columns = list(dict_result['data'][0].keys())
+    mongo_data = []
+    for i in dict_result['data']:
+        mongo_data.append([v for k,v in i.items()])
+    return columns, mongo_data
+
+def mongodata_to_dict(records):
+    adict = [dict(zip(records.columns, d)) for d in records.data ]
+    data_dict = {'data': adict}
+    result = defaultdict(lambda: [])
+    dict_result = json.loads(ex_data)
+    for i in dict_result['data']:
+        try:
+            count = len(result[i['Team']])
+        except:
+            count = 0
+        i.update({'index': count})
+        result[i['Team']].append(i)
+        count+=1
+    return result
+
+def ex_data_to_mongo_data(filepath, skip_rows=2):
+    ex_data = pd.read_excel(filepath, skiprows=skip_rows)
+    ex_data = ex_data.to_json(orient='table')
+    result = defaultdict(lambda: [])
+    dict_result = json.loads(ex_data)
+    cols = [i['name'] for i in dict_result['schema']['fields']]
+    for i in dict_result['data']:
+        try:
+            count = len(result[i['Team']])
+        except:
+            count = 0
+        i.update({'index': count})
+        result[i['Team']].append(i)
+        count+=1
+    return dict(result), cols
