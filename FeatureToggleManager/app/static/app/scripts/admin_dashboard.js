@@ -1,13 +1,13 @@
-function datatotable_gen(data, table_id, token, editable, in_buttons=[]) {
+function datatotable_gen(cols, data, table_id, token, editable, in_buttons=[]) {
     //console.log(data);
     const keys = Object.keys(data[0]);
     // Create coloumn headings dynamically from the input data.
     var columns = [];
-    $.each(keys, function (i, v) {
-        columns.push({ 'data': v, 'title': v });
+    $.each(cols, function (i, v) {
+        columns.push({'title': v });
     });
     Dt_table = $("#" + table_id).DataTable({
-        "data": data,
+        "data": data ,
         "columns": columns,
         dom: 'Blfrtip',        // Needs button container
         select: 'single',

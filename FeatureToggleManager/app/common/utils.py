@@ -6,6 +6,7 @@ import pandas as pd
 import json
 import glob
 from collections import defaultdict
+from app.models import TeamData
 
 def upload_file_to_dir(user, uploaded_file):
     """
@@ -161,3 +162,12 @@ def ex_data_to_mongo_data(filepath, skip_rows=2):
         result[i['Team']].append(i)
         count+=1
     return dict(result), cols
+
+def read_mongo_data(teamname):
+    team_data = TeamData.objects.filter(team_name=teamname).latest('id')
+    print(team_data)
+    return team_data
+
+def write_mongo_data(teamname, **kwargs):
+    TeamData.objects.create(team_name=teamname, **kwargs)
+    return

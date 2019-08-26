@@ -13,7 +13,7 @@ import pandas as pd
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 import os
-from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update, excel_data_to_teamwise_data, dataframe_to_mongodata, mongodata_to_dict, ex_data_to_mongo_data
+from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update, excel_data_to_teamwise_data, dataframe_to_mongodata, mongodata_to_dict, ex_data_to_mongo_data, read_mongo_data, write_mongo_data
 import json
 from django.views.generic import View
 from django.http import QueryDict
@@ -55,10 +55,11 @@ def home(request):
     #teams_data.save()
     data_dict={}
     #try:
-    latest_record = TeamData.objects.values('team_name', 'columns', 'data')
-    print(latest_record.values())
-    #if latest_record:
-        #data_dict = mongodata_to_dict(latest_record)
+    latest_team_records= list(TeamData.objects.values('team_name','columns','data').distinct())
+    print(latest_team_records)
+
+    #if records:
+        #data_dict = mongodata_to_dict(records)
         #print(data_dict)
     #except:
         #pass
@@ -66,7 +67,7 @@ def home(request):
         request,
         'app/excel_data.html',
         {
-            'd_data': json.dumps(data_dict),
+            'd_data': json.dumps(latest_team_records),
             'title':'Home',
             'dashboard_title': dashboard_title,
             'year':datetime.now().year,
@@ -83,9 +84,13 @@ class EditTable(LoginRequiredMixin, View):
             for k, v in self.request.POST.items():
                 req_data[k] = v
             tb_name = req_data.pop('table_name')
-            ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
-            df = dict_to_dataframe(req_data)
-            excel_append(ex_data, df, latest_file)
+            print(tb_name)
+            team_name = tb_name.split('_table')[0]
+            print(team_name)
+            _ = write_mongo_data(team_name, **kwargs)
+            #ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
+            #df = dict_to_dataframe(req_data)
+            #excel_append(ex_data, df, latest_file)
             return HttpResponse(json.dumps("Record added successfully."))
         except:
             raise Exception("Fail to add record.")

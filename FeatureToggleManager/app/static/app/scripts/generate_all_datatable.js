@@ -17,6 +17,7 @@
 //};
 
 function generate_datatables(t_data, csrf_token, editable) {
+    console.log('hi');
     buttons = [{
         text: 'Add',
         name: 'add'        // do not change name
@@ -41,16 +42,31 @@ function generate_datatables(t_data, csrf_token, editable) {
         className: 'save_button',
     }
     ];
-
-    for (const [key, value] of Object.entries(t_data)) {
-        var team_name = key.replace(/ /g, "_");
+    console.log(t_data.length);
+    for (var i = 0, l = t_data.length; i < l; i++) {
+        console.log(t_data[i]);
+        var team = t_data[i]['team_name'];
+        var cols = t_data[i]['columns'];
+        var data = t_data[i]['data'];
+        var team_name = team.replace(/ /g, "_");
         generate_team_accordian(team_name);
         var table_name = team_name + "_table";
         if (editable) {
-            dt_table = datatotable_gen(value, table_name, csrf_token, editable, buttons);
+            dt_table = datatotable_gen(cols, data, table_name, csrf_token, editable, buttons);
         } else {
-            dt_table = datatotable_gen(value, table_name, csrf_token, editable)
+            dt_table = datatotable_gen(cols, data, table_name, csrf_token, editable)
         }
-        //add_colum_filter(table_name, dt_table);
     }
-}
+    //for (const [key, value] of Object.entries(t_data)) {
+    //    console.log(key, value);
+    //    var team_name = key.replace(/ /g, "_");
+    //    generate_team_accordian(team_name);
+    //    var table_name = team_name + "_table";
+    //    if (editable) {
+    //        dt_table = datatotable_gen(value, table_name, csrf_token, editable, buttons);
+    //    } else {
+    //        dt_table = datatotable_gen(value, table_name, csrf_token, editable)
+    //    }
+    //    //add_colum_filter(table_name, dt_table);
+    //}
+};
