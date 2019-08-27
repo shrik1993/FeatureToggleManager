@@ -27,10 +27,16 @@ def fileupload(request):
         #result = excel_to_json(uploaded_file_path)
         #d_data = get_datatable_data(result)
         result, cols = ex_data_to_mongo_data(uploaded_file_path)
-        teams_data = []
+        #teams_data = []
         for k, v in result.items():
-            teams_data.append(TeamData(columns=cols, data=[list(val.values()) for val in v], team_name=k))
-        TeamData.objects.bulk_create(teams_data)
+            if k:
+                rec = TeamData.objects.filter(team_name=k)
+                if rec:
+                    print('in update')
+                    rec.update(columns=cols, data=[list(val.values()) for val in v], team_name=k)
+                else:
+                    print('in insert')
+                    TeamData.objects.create(columns=cols, data=[list(val.values()) for val in v], team_name=k)
         return render(request, 'app/excel_data.html', 
                       {'uploaded_file_url': uploaded_file_url,
                        'd_data': json.dumps(result),

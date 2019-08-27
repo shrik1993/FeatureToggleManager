@@ -1,0 +1,1 @@
+C:\Users\schaudhari3\source\repos\FeatureToggleManager\FeatureToggleManager\obj\Debug\FeatureToggleManager.pyproj.CoreCompileInputs.cache
