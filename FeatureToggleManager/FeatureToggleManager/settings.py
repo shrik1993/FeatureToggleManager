@@ -86,6 +86,8 @@ DATABASES = {
       'default': {
           'ENGINE': 'djongo',
           'NAME': 'FeatureTracker',
+          'HOST': 'mongo',
+          'PORT': 27017
       }
   }
 
