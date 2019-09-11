@@ -51,6 +51,6 @@ function generate_datatables(t_data, csrf_token, editable) {
         } else {
             dt_table = datatotable_gen(value, table_name, csrf_token, editable)
         }
-        add_colum_filter(table_name, dt_table);
+        //add_colum_filter(table_name, dt_table);
     }
 }
