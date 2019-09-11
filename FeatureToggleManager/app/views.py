@@ -13,7 +13,7 @@ import pandas as pd
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse
 import os
-from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update, excel_data_to_teamwise_data, dataframe_to_mongodata, mongodata_to_dict, ex_data_to_mongo_data, read_mongo_data, write_mongo_data
+from app.common.utils import upload_file_to_dir, excel_to_json, get_datatable_data, excel_read, dict_to_dataframe, excel_append, excel_remove, get_latest_file_from_dir, read_user_excel, excel_remove, excel_update, excel_data_to_teamwise_data, dataframe_to_mongodata, mongodata_to_dict, ex_data_to_mongo_data, read_mongo_data, write_mongo_data, delete_row
 import json
 from django.views.generic import View
 from django.http import QueryDict
@@ -33,13 +33,15 @@ def fileupload(request):
                 rec = TeamData.objects.filter(team_name=k)
                 if rec:
                     print('in update')
-                    rec.update(columns=cols, data=[list(val.values()) for val in v], team_name=k)
+                    rec.update(columns=cols, data=v, team_name=k)
                 else:
                     print('in insert')
-                    TeamData.objects.create(columns=cols, data=[list(val.values()) for val in v], team_name=k)
+                    TeamData.objects.create(columns=cols, data=v, team_name=k)
+        latest_team_records= list(TeamData.objects.values('team_name','columns','data').distinct())
+        print(json.dumps(latest_team_records))
         return render(request, 'app/excel_data.html', 
                       {'uploaded_file_url': uploaded_file_url,
-                       'd_data': json.dumps(result),
+                       'd_data': json.dumps(latest_team_records),
                        'dashboard_title': "Admin Dashboard",
                        'year':datetime.now().year,
         })
@@ -122,8 +124,10 @@ class EditTable(LoginRequiredMixin, View):
             delete_r = QueryDict(self.request.body)
             tb_name = delete_r.get('table_name')
             index_id = delete_r.get('index_id')
-            ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
-            excel_remove(ex_data, int(index_id), latest_file)
+            team = delete_r.get('team')
+            # ex_data, latest_file = read_user_excel(self.request.user, self.request.user.is_superuser)
+            # excel_remove(ex_data, int(index_id), latest_file)
+            delete_row(team, index_id)
             return HttpResponse(json.dumps("Record deleted successfully."))
         except: 
             raise Exception('Record delete failed.')

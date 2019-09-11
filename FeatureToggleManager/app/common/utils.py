@@ -171,3 +171,14 @@ def read_mongo_data(teamname):
 def write_mongo_data(teamname, **kwargs):
     TeamData.objects.create(team_name=teamname, **kwargs)
     return
+
+def delete_row(teamname, index_id):
+    result = TeamData.objects.filter(team_name=teamname).values('data')
+    print("##############")
+    print(result)
+    for rec in result:
+        print("@@@@@@@@@@@@@@@@@@@")
+        print(rec)
+        print('###################')
+    print(TeamData.objects.values('team_name','columns','data').filter(team_name=teamname))
+    return

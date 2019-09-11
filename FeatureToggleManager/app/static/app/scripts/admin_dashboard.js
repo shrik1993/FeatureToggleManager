@@ -1,11 +1,11 @@
-function datatotable_gen(cols, data, table_id, token, editable, in_buttons=[]) {
-    //console.log(data);
-    const keys = Object.keys(data[0]);
+function datatotable_gen(cols, data, team, table_id, token, editable, in_buttons=[]) {
     // Create coloumn headings dynamically from the input data.
     var columns = [];
     $.each(cols, function (i, v) {
-        columns.push({'title': v });
+        columns.push({'data': v, 'title': v});
     });
+    console.log(columns);
+    console.log(data);
     Dt_table = $("#" + table_id).DataTable({
         "data": data ,
         "columns": columns,
@@ -28,7 +28,7 @@ function datatotable_gen(cols, data, table_id, token, editable, in_buttons=[]) {
         },
         onDeleteRow: function (datatable, rowdata, success, error) {
             console.log(rowdata);
-            var data = { "table_name": table_id, "index_id": rowdata['index'] };
+            var data = { "table_name": table_id, "team": team ,"index_id": rowdata['index'] };
             $.ajax({
                 url: '/edittable/',
                 headers: { "X-CSRFToken": token },

@@ -5,8 +5,8 @@ services:
     ports:
     - "90:5000"
     depends_on:
-    - mongo
-  mongo:
-    image: mongo:latest
+    - feature_toggle_mongo
+  feature_toggle_mongo:
+    image: mongo:3.6
     ports:
     - "27018:27017"
